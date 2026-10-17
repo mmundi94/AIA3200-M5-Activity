@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice Activity: Who Handles the Missed Dose?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;800&family=Azeret+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#fff1ea; --ink:#1e1b2e; --soft:#5e586f;
+    --blue:#0b5394; --violet:#582fc1;
+    --tom:#ff5a5f; --mint:#1fbf86; --butter:#ffc93c; --butterD:#b98600; --orch:#d65db1;
+    --ok:#159a62; --miss:#e8344e;
+    --sans:"Lexend","Segoe UI",system-ui,sans-serif; --mono:"Azeret Mono",ui-monospace,Menlo,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{font-family:var(--sans);color:var(--ink);background:var(--bg);min-height:100vh;line-height:1.5;padding-bottom:92px;overflow-x:hidden}
+  body::before{content:"";position:fixed;inset:0;z-index:-2;
+    background:radial-gradient(40% 30% at 0% 0%,rgba(255,90,95,.30),transparent 70%),radial-gradient(40% 35% at 100% 30%,rgba(31,191,134,.28),transparent 70%),
+               radial-gradient(45% 35% at 20% 100%,rgba(214,93,177,.28),transparent 70%),radial-gradient(35% 30% at 85% 100%,rgba(255,201,60,.35),transparent 70%)}
+  body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.3;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .12  0 0 0 0 .1  0 0 0 0 .18  0 0 0 .6 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+  .wrap{max-width:1040px;margin:0 auto;padding:16px 16px 20px}
+  .top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+  .brand b{display:block;font-size:18px;color:var(--blue);font-weight:800}
+  .brand span{font-family:var(--mono);font-size:11.5px;color:var(--soft)}
+  .chip{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;color:#fff;background:var(--violet);padding:8px 14px;border-radius:10px 10px 10px 2px}
+
+  /* hero stage */
+  .hero{position:relative;border-radius:30px;overflow:hidden;color:#fff;
+    background:linear-gradient(120deg,var(--hc1,#ff5a5f) 0%,var(--hc2,#d65db1) 55%,var(--violet) 100%);
+    display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);min-height:270px;box-shadow:0 22px 50px -28px rgba(88,47,193,.8)}
+  .hero::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:.35;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.1' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+  .hero .blob{position:absolute;border-radius:50%;filter:blur(2px);opacity:.35;animation:orbit 12s ease-in-out infinite alternate}
+  .hero .b1{width:160px;height:160px;background:var(--butter);left:-40px;bottom:-60px}
+  .hero .b2{width:110px;height:110px;background:var(--mint);right:30%;top:-50px;animation-delay:-4s}
+  @keyframes orbit{to{transform:translate(30px,-20px) scale(1.15)}}
+  .hero-text{position:relative;z-index:1;padding:24px 10px 24px 26px;display:flex;flex-direction:column;justify-content:center}
+  .hero-text .k{font-family:var(--mono);font-size:11.5px;letter-spacing:.6px;text-transform:uppercase;opacity:.9}
+  .hero-text h2{margin:6px 0 6px;font-size:clamp(22px,3vw,32px);line-height:1.1;font-weight:800}
+  .hero-text p{margin:0;font-size:14px;opacity:.92}
+  .scene{position:relative;z-index:1;margin:14px;border-radius:22px;background:rgba(255,255,255,.93);color:var(--ink);min-height:290px;overflow:hidden}
+  .scap{position:absolute;left:12px;right:12px;bottom:8px;font-size:12.5px;color:var(--soft);text-align:center;min-height:18px}
+  .scap b{color:var(--ink)}
+
+  /* question */
+  .qcard{max-width:820px;margin:18px auto 0;position:relative;z-index:2;background:#fff;border-radius:24px;padding:22px 24px;box-shadow:0 16px 40px -24px rgba(30,27,46,.55)}
+  .qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+  .eyebrow{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--sc,var(--blue))}
+  .pill{font-family:var(--mono);font-size:11px;font-weight:700;padding:4px 10px;border-radius:999px;background:var(--scs,#eef)}
+  h1{font-size:clamp(28px,4.5vw,44px);line-height:1.05;margin:6px 0 12px;font-weight:800;letter-spacing:-.8px}
+  .u{text-decoration:underline;text-decoration-color:var(--butter);text-decoration-thickness:8px;text-underline-offset:-2px;text-decoration-skip-ink:none}
+  p{margin:0 0 12px}
+  .lead{font-size:16px;color:var(--soft)}
+  .prompt{font-size:19px;font-weight:600;line-height:1.4;margin:12px 0 12px;overflow-wrap:anywhere}
+  .ask{font-size:14px;font-weight:600;color:var(--soft);margin-bottom:10px}
+  .opts{display:grid;gap:10px;grid-template-columns:repeat(var(--cols,2),minmax(0,1fr))}
+  .opt{font-family:var(--sans);text-align:left;cursor:pointer;background:#fff;border:2px solid var(--cs);border-radius:16px;padding:11px 12px;display:flex;align-items:center;gap:11px;
+    font-size:15px;font-weight:600;color:var(--ink);position:relative;transition:transform .12s,background .12s}
+  .opt .oi{flex:0 0 38px;height:38px;border-radius:11px;background:var(--cs);color:var(--c);display:grid;place-items:center;transition:transform .3s}
+  .opt .oi svg{width:24px;height:24px}
+  .opt small{display:block;font-weight:400;font-size:12px;color:var(--soft)}
+  .opt:hover:not([disabled]){transform:translateY(-2px);background:var(--cs)}
+  .opt:hover:not([disabled]) .oi{transform:rotate(-8deg) scale(1.08)}
+  .opt[disabled]{cursor:default}.opt.dim{opacity:.4}
+  .opt.mine.right{border-color:var(--ok);background:#e3f6ec}
+  .opt.mine.wrong{border-color:var(--miss);background:#fde5e9}
+  .opt.truth{border-color:var(--ok);border-style:dashed;background:#f0faf5}
+  .tag{position:absolute;top:-10px;right:10px;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;white-space:nowrap}
+  .tag.ok{background:var(--ok);color:#fff}.tag.no{background:var(--miss);color:#fff}.tag.ans{background:#fff;color:var(--ok);border:1.5px solid var(--ok)}
+  .status{margin-top:16px;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;padding:12px 14px;border-radius:16px;background:#f7f2ff}
+  .status .m{display:flex;align-items:center;gap:10px;font-weight:600}
+  .dot{width:26px;height:26px;border-radius:9px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:13px}
+  .dot.ok{background:var(--ok)}.dot.no{background:var(--miss)}
+  .btn{font-family:var(--sans);font-weight:800;font-size:15.5px;border:0;cursor:pointer;background:var(--blue);color:#fff;padding:12px 22px;border-radius:14px 14px 14px 4px;transition:transform .12s, box-shadow .12s;box-shadow:4px 4px 0 var(--butter)}
+  .btn:hover{transform:translate(-2px,-2px);box-shadow:6px 6px 0 var(--butter)}
+  .btn:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--butter)}
+  .btn.alt{background:#fff;color:var(--ink);border:2px solid var(--ink)}
+  .btn:focus-visible,.opt:focus-visible{outline:3px solid var(--violet);outline-offset:3px}
+  .lanes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0 18px}
+  .lane{border-radius:18px;padding:12px;background:var(--cs);border-top:5px solid var(--c)}
+  .lane b{display:block;font-size:14.5px}.lane small{font-size:12px;color:var(--soft)}
+  .lane .li{width:36px;height:36px;border-radius:10px;background:#fff;color:var(--c);display:grid;place-items:center;margin-bottom:6px}
+  .lane .li svg{width:22px;height:22px}
+  .note{font-size:13.5px;color:var(--soft)}
+  .keys{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+  .key{font-size:12.5px;font-weight:600;padding:6px 11px;border-radius:999px;background:var(--cs);color:var(--ink)}
+
+  /* dock */
+  .dock{position:fixed;left:0;right:0;bottom:0;z-index:5;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);border-top:3px solid var(--violet)}
+  .dock-in{max-width:1040px;margin:0 auto;padding:10px 16px;display:flex;gap:14px;align-items:center}
+  .dgroup{flex:var(--n);min-width:0}
+  .dgroup .dl{font-size:11.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--soft)}
+  .dgroup.cur .dl{color:var(--ink)}
+  .ddots{display:flex;gap:3px;margin-top:4px}
+  .ddots i{flex:1;height:10px;border-radius:4px;background:#ece6f2;transition:background .3s}
+  .ddots i.ok{background:var(--ok)}.ddots i.no{background:var(--miss)}.ddots i.cur{background:var(--c);animation:breathe 1.2s infinite}
+  @keyframes breathe{50%{opacity:.4}}
+  .dcount{font-family:var(--mono);font-size:12px;font-weight:700;white-space:nowrap}
+
+  /* scene: workers */
+  .ws{position:absolute;inset:0;padding:16px 14px 30px}
+  .ticket{position:absolute;left:50%;top:16px;transform:translateX(-50%);max-width:78%;background:var(--ink);color:#fff;font-size:12.5px;font-weight:600;padding:8px 12px;border-radius:12px;
+    box-shadow:0 8px 18px -8px rgba(0,0,0,.5);transition:transform .75s cubic-bezier(.5,-.2,.3,1.3),opacity .3s;z-index:3;text-align:center;animation:hover 2.4s ease-in-out infinite}
+  @keyframes hover{50%{margin-top:-5px}}
+  .ticket.go{animation:none}
+  .workers{position:absolute;left:12px;right:12px;bottom:34px;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+  .wk{border-radius:16px;background:var(--cs);text-align:center;padding:10px 4px 8px;border:2px solid transparent;transition:transform .3s}
+  .wk .wi{width:46px;height:46px;margin:0 auto 4px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center}
+  .wk .wi svg{width:28px;height:28px}
+  .wk b{font-size:12px;display:block;line-height:1.2}
+  .wk.catch{border-color:var(--ok);animation:catch .6s ease}
+  @keyframes catch{30%{transform:translateY(-10px) scale(1.06)}60%{transform:translateY(2px)}}
+  .wk.bad{border-color:var(--miss);animation:shake .45s}
+  @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+  .idle .wk{animation:bob 2.6s ease-in-out infinite}.idle .wk:nth-child(2){animation-delay:.3s}.idle .wk:nth-child(3){animation-delay:.6s}.idle .wk:nth-child(4){animation-delay:.9s}
+  @keyframes bob{50%{transform:translateY(-6px)}}
+
+  .svgwrap{position:absolute;inset:8px 8px 28px}
+  .svgwrap>svg{width:100%;height:100%;display:block}
+  #beam{transition:transform 1s cubic-bezier(.3,1.6,.5,1);transform-origin:180px 64px}
+  .wdrop{animation:wdrop .7s cubic-bezier(.3,1.5,.5,1)}
+  @keyframes wdrop{from{transform:translateY(-70px);opacity:0}to{transform:none;opacity:1}}
+  #needle{transition:transform 1.1s cubic-bezier(.3,1.6,.5,1);transform-origin:180px 168px}
+  .panels{position:absolute;inset:14px 14px 32px;display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .pn{border-radius:18px;padding:12px;text-align:center;background:var(--cs);border:2px solid transparent;transition:opacity .4s, transform .4s}
+  .pn .art{height:80px;display:flex;align-items:center;justify-content:center;gap:8px;color:var(--c)}
+  .pn .art svg{width:46px;height:46px}
+  .pn b{display:block;font-size:14px}.pn small{font-size:11.5px;color:var(--soft)}
+  .pn.win{border-color:var(--ok);transform:scale(1.03)}.pn.lose{opacity:.35}.pn.bad{border-color:var(--miss)}
+  .typing{display:inline-flex;gap:3px}.typing i{width:6px;height:6px;border-radius:50%;background:currentColor;animation:breathe 1s infinite}
+  .typing i:nth-child(2){animation-delay:.2s}.typing i:nth-child(3){animation-delay:.4s}
+  .flow{position:absolute;inset:20px 12px 40px;display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .fn{flex:1;text-align:center;border-radius:16px;padding:10px 4px;background:var(--cs);border:2px solid transparent;position:relative;z-index:1}
+  .fn .wi{width:42px;height:42px;margin:0 auto 4px;border-radius:12px;background:var(--c);color:#fff;display:grid;place-items:center}
+  .fn .wi svg{width:24px;height:24px}
+  .fn b{font-size:12.5px;display:block}.fn small{font-size:10.5px;color:var(--soft);display:block;line-height:1.2}
+  .fn.win{border-color:var(--ok);animation:catch .6s ease}.fn.bad{border-color:var(--miss);animation:shake .45s}
+  .arrow{flex:0 0 26px;height:4px;background:repeating-linear-gradient(90deg,var(--violet) 0 6px,transparent 6px 10px);position:relative;animation:dash .8s linear infinite;background-size:10px 4px}
+  @keyframes dash{to{background-position:10px 0}}
+  .pkt{position:absolute;top:50%;width:14px;height:14px;margin-top:-7px;border-radius:4px;background:var(--butter);border:2px solid var(--ink);z-index:2;left:6%;animation:travel 2.6s ease-in-out infinite}
+  @keyframes travel{0%{left:8%}45%{left:48%}55%{left:48%}100%{left:88%}}
+  .grid4{position:absolute;inset:14px 14px 32px;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .pt{border-radius:14px;background:var(--cs);display:flex;align-items:center;gap:10px;padding:8px 10px;border:2px solid transparent;transition:opacity .4s}
+  .pt .wi{flex:0 0 38px;height:38px;border-radius:50%;background:var(--c);color:#fff;display:grid;place-items:center}
+  .pt .wi svg{width:22px;height:22px}
+  .pt b{font-size:12.5px;display:block}.pt small{font-size:10.5px;color:var(--soft);line-height:1.2;display:block}
+  .pt.win{border-color:var(--ok);animation:catch .6s ease}.pt.lose{opacity:.35}.pt.bad{border-color:var(--miss);opacity:1}
+  .ladder{position:absolute;inset:12px 16px 54px;gap:6px;display:flex;flex-direction:column;justify-content:space-between}
+  .rung{display:flex;align-items:center;gap:10px;border-radius:12px;padding:6px 10px;background:#f6f2fb;font-size:12.5px;transition:background .3s,opacity .3s}
+  .rung em{font-style:normal;font-family:var(--mono);font-size:10.5px;color:var(--soft);min-width:74px}
+  .rung.on{background:#e3f6ec;font-weight:600}
+  .rung.off{opacity:.35;text-decoration:line-through}
+  .rung .badge{margin-left:auto;white-space:nowrap;font-family:var(--mono);font-size:10px;font-weight:700;padding:2px 8px;border-radius:999px;background:var(--miss);color:#fff}
+  .rung .badge.g{background:var(--ok)}
+  .env{display:inline-block;width:16px;height:12px;border-radius:3px;background:var(--orch);border:1.5px solid var(--ink);margin-left:4px;transition:transform .6s,opacity .6s}
+
+  /* final */
+  .board{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin:16px 0 18px}
+  .bcol{border-radius:18px;background:var(--cs);padding:12px;border-top:6px solid var(--c)}
+  .bcol .n{font-size:30px;font-weight:800;line-height:1;color:var(--c)}
+  .bcol .l{font-size:13px;font-weight:600;margin:4px 0 8px}
+  .bcol ul{list-style:none;margin:0;padding:0;display:grid;gap:5px}
+  .bcol li{font-size:12px;display:flex;gap:6px;align-items:baseline;line-height:1.3}
+  .bcol li i{flex:0 0 9px;height:9px;border-radius:3px;background:var(--ok);transform:translateY(1px)}
+  .bcol li i.no{background:transparent;border:2px solid var(--miss)}
+  .bcol li em{font-style:normal;color:var(--soft)}
+  .ideas{list-style:none;margin:0 0 20px;padding:0;display:grid;gap:10px}
+  .ideas li{border-radius:16px;padding:12px 14px 12px 50px;background:var(--cs);position:relative;font-size:15px}
+  .ideas li::before{content:attr(data-n);position:absolute;left:12px;top:12px;width:28px;height:28px;border-radius:9px;background:var(--c);color:#fff;font-family:var(--mono);font-size:12px;font-weight:700;display:grid;place-items:center}
+  .confetti i{position:absolute;width:10px;height:14px;border-radius:3px;animation:fallc 3.2s linear infinite;opacity:.9}
+  @keyframes fallc{from{transform:translateY(-30px) rotate(0)}to{transform:translateY(270px) rotate(540deg)}}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--soft);margin:-6px 0 14px}
+  .legend span{display:inline-flex;align-items:center;gap:6px}
+  .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+  @media (max-width:800px){
+    .hero{grid-template-columns:1fr}
+    .hero-text{padding:20px 20px 0}
+    .scene{min-height:300px}
+    .lanes,.board{grid-template-columns:repeat(2,minmax(0,1fr))}
+    .qcard{margin-top:14px}
+  }
+  @media (max-width:560px){
+    .opts{grid-template-columns:1fr!important}
+    .qcard{padding:18px}
+    .prompt{font-size:17px}
+    .lanes,.board{grid-template-columns:1fr}
+    .dgroup .dl{font-size:10px}
+    .wk b{font-size:10.5px}.wk .wi{width:38px;height:38px}
+    .fn small{display:none}
+    .rung em{min-width:58px}
+  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand"><b>Nexford University</b><span>AIA3200 · Foundations of Robotics and IoT</span></div>
+    <span class="chip">Practice Activity · Module 5</span>
+  </header>
+  <section class="hero" id="hero">
+    <span class="blob b1"></span><span class="blob b2"></span>
+    <div class="hero-text" id="htext"></div>
+    <div class="scene" id="scene" aria-live="off"></div>
+  </section>
+  <section class="qcard" id="stage" aria-live="polite"></section>
+</div>
+<nav class="dock" aria-label="Progress"><div class="dock-in" id="dock"></div></nav>
+
+<script>
+(function(){
+  "use strict";
+  var REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var P='viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"';
+  var G={
+    robot:'<path d="M5 27h12"/><path d="M11 27v-5"/><circle cx="11" cy="20" r="2.4"/><path d="M12.5 18L18 10"/><circle cx="19" cy="8.5" r="2.4"/><path d="M21 9.5l5 4"/><path d="M25 16l3 2M26.5 12l2-1"/>',
+    rpa:'<rect x="4" y="6" width="24" height="16" rx="3"/><path d="M12 27h8M16 22v5"/><path d="M15 11l5 4-2.5.5L19 19l-1.5.5-1.5-3.5L14 17.5z" fill="currentColor"/>',
+    agent:'<circle cx="16" cy="16" r="4"/><path d="M16 4v5M16 23v5M4 16h5M23 16h5"/><path d="M8 8l3 3M21 21l3 3M24 8l-3 3M11 21l-3 3"/>',
+    person:'<circle cx="16" cy="9" r="4.5"/><path d="M7 27c0-6 4-10 9-10s9 4 9 10"/>',
+    agv:'<rect x="5" y="12" width="22" height="9" rx="2"/><circle cx="10" cy="24" r="2.5"/><circle cx="22" cy="24" r="2.5"/><path d="M3 28h26" stroke-dasharray="3 3"/>',
+    amr:'<rect x="6" y="12" width="20" height="9" rx="4"/><circle cx="11" cy="24" r="2.5"/><circle cx="21" cy="24" r="2.5"/><path d="M11 8a7 7 0 0 1 10 0M13.5 10.5a3.5 3.5 0 0 1 5 0"/>',
+    thru:'<path d="M5 22h6l3-6 4 10 3-8h6"/><path d="M22 6l4 4-4 4"/>',
+    accur:'<circle cx="16" cy="16" r="11"/><circle cx="16" cy="16" r="6"/><circle cx="16" cy="16" r="1.6" fill="currentColor"/>',
+    labor:'<circle cx="16" cy="16" r="11"/><path d="M16 9v7l5 3"/>',
+    roi:'<path d="M16 4v24"/><path d="M6 10h20"/><path d="M6 10l-3 8h6zM26 10l-3 8h6z"/>',
+    good:'<path d="M9 27V14l6-9c2 0 3 2 2.5 4L16 14h9a2 2 0 0 1 2 2.4l-1.8 8.4A3 3 0 0 1 22.3 27z"/><path d="M5 14h4v13H5z"/>',
+    poor:'<path d="M9 5v13l6 9c2 0 3-2 2.5-4L16 18h9a2 2 0 0 0 2-2.4l-1.8-8.4A3 3 0 0 0 22.3 5z"/><path d="M5 5h4v13H5z"/>',
+    api:'<path d="M10 8l-6 8 6 8M22 8l6 8-6 8"/><path d="M18 6l-4 20"/>',
+    attended:'<circle cx="10" cy="10" r="3.5"/><path d="M4 26c0-5 3-8 6-8s6 3 6 8"/><rect x="18" y="12" width="11" height="9" rx="2"/><path d="M21 25h5"/>',
+    unattended:'<path d="M22 5a9 9 0 1 0 5 13A7 7 0 0 1 22 5z"/><rect x="5" y="20" width="12" height="8" rx="2"/><circle cx="9" cy="24" r="1" fill="currentColor"/>',
+    producer:'<rect x="9" y="5" width="14" height="22" rx="4"/><path d="M12 12h8l-1 6h-6z"/>',
+    router:'<path d="M16 4l10 6v12l-10 6-10-6V10z"/><path d="M11 16h10M18 13l3 3-3 3"/>',
+    consumer:'<rect x="5" y="6" width="22" height="20" rx="3"/><path d="M9 12h14M9 17h14M9 22h8"/>',
+    approval:'<path d="M6 26h20"/><path d="M10 26v-4h12v4"/><path d="M12 22l1-8a3 3 0 0 1 6 0l1 8"/><path d="M14 9a2 2 0 1 1 4 0"/>',
+    confidence:'<path d="M4 16h8"/><path d="M12 16l6-7h10M12 16l6 7h10"/><circle cx="12" cy="16" r="2.5"/>',
+    escalation:'<path d="M5 27h6v-6h6v-6h6V9h4"/><path d="M23 5l4 4-4 4"/>',
+    audit:'<circle cx="14" cy="14" r="8"/><path d="M20 20l7 7"/><path d="M11 12h6M11 16h4"/>',
+    stop:'<path d="M11 4h10l7 7v10l-7 7H11l-7-7V11z"/><path d="M11 16h10"/>',
+    dedupe:'<rect x="4" y="5" width="12" height="9" rx="2"/><rect x="4" y="18" width="12" height="9" rx="2"/><path d="M17 9.5h4l4 6.5-4 6.5h-4"/><path d="M25 16h4"/>',
+    next:'<path d="M5 16h18M17 9l7 7-7 7"/>',
+    blueprint:'<rect x="4" y="5" width="24" height="22" rx="3"/><path d="M4 11h24M11 11v16"/><path d="M15 17h9M15 22h6"/>'
+  };
+  function ic(k){return '<svg '+P+'>'+G[k]+'</svg>';}
+  function esc(t){return String(t).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");}
+  var K={tom:["#ff5a5f","#ffe7e7"],mint:["#1fbf86","#ddf7ec"],butter:["#b98600","#fff4d1"],orch:["#d65db1","#fae6f4"],blue:["#0b5394","#e3edf8"],violet:["#582fc1","#ece6fb"],ok:["#159a62","#e3f6ec"],miss:["#e8344e","#fde5e9"],ink:["#1e1b2e","#ecebf1"]};
+  function op(key,label,icon,col,sub){return {key:key,label:label,icon:icon,c:K[col][0],cs:K[col][1],sub:sub||""};}
+
+  var WHO=[op("robot","Physical robot","robot","tom","Moves things"),op("rpa","RPA bot","rpa","blue","Works through screens"),op("agent","AI agent","agent","violet","Reads, decides, uses tools"),op("person","Person","person","mint","Judgment and accountability")];
+  var MOVE=[op("agv","AGV","agv","butter","Follows a fixed route"),op("amr","AMR","amr","orch","Maps and plans its own route")];
+  var PILLAR=[op("thru","Throughput","thru","tom"),op("accur","Accuracy","accur","blue"),op("labor","Labor","labor","mint"),op("roi","Total cost (ROI and payback)","roi","violet")];
+  var FIT=[op("good","Good RPA candidate","good","mint"),op("poor","Poor RPA candidate","poor","tom"),op("api","Use the API instead","api","blue")];
+  var MODE=[op("attended","Attended bot","attended","butter","A person starts it"),op("unattended","Unattended bot","unattended","violet","Runs on its own")];
+  var ROLE=[op("producer","Producer","producer","tom","Creates events"),op("router","Router","router","violet","Delivers events"),op("consumer","Consumer","consumer","mint","Reacts to events")];
+  var HITL=[op("approval","Approval","approval","blue"),op("confidence","Confidence routing","confidence","orch"),op("escalation","Escalation","escalation","tom"),op("audit","Audit","audit","mint")];
+  var RULE=[op("stop","Stop the ladder and record the outcome","stop","mint"),op("dedupe","Ignore the duplicates","dedupe","blue"),op("next","Move to the next escalation step","next","tom")];
+
+  var STATIONS=[
+    {name:"Who Takes the Task?",short:"Who does it",c:"#ff5a5f",cs:"#ffe7e7",hc:["#ff5a5f","#d65db1"],icon:"robot",
+     brief:"Robots move things, RPA bots type through screens, AI agents read and decide, and people bring judgment and accountability. Hand each CareLoop task to the right worker.",
+     items:[
+       {q:"Store medication packs densely and pick the right one when a prescription is filled.",a:"robot",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Store and pick medication packs"},
+       {q:"Copy each refill request from the patient portal into a pharmacy system that has no API.",a:"rpa",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Retype refill requests"},
+       {q:"Read incoming caregiver messages and route the ones it clearly understands, sending unclear ones to a nurse.",a:"agent",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Route caregiver messages"},
+       {q:"Decide whether an early refill is clinically appropriate.",a:"person",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Is the refill clinically appropriate?"},
+       {q:"Carry lab samples between floors through busy hospital corridors.",a:"robot",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Carry lab samples between floors"},
+       {q:"A caregiver writes that her mother's pills are almost out and she has felt dizzy since the new one.",a:"person",opts:WHO,scene:"workers",ask:"Who or what should handle this?",log:"Dizziness after a new medicine"}
+     ]},
+    {name:"Make the Robot Case",short:"Robot case",c:"#b98600",cs:"#fff4d1",hc:["#ffb020","#ff5a5f"],icon:"roi",
+     brief:"Companies buy robots when the numbers work. Choose the right kind of mobile robot, then place each fact on the business case Sam needs for a dispensing robot.",
+     items:[
+       {q:"A warehouse has a stable route and quiet aisles that rarely change.",a:"agv",opts:MOVE,scene:"corridor",busy:false,ask:"Which mobile robot fits?",log:"Stable route, quiet aisles"},
+       {q:"A hospital corridor is full of patients, visitors, and carts.",a:"amr",opts:MOVE,scene:"corridor",busy:true,ask:"Which mobile robot fits?",log:"Busy hospital corridor"},
+       {q:"The pharmacy can fill more prescriptions per hour.",a:"thru",opts:PILLAR,scene:"scale",ask:"Where does this belong in the business case?",log:"More prescriptions per hour"},
+       {q:"The robot frees technician hours for patient counseling.",a:"labor",opts:PILLAR,scene:"scale",ask:"Where does this belong in the business case?",log:"Hours freed for counseling"},
+       {q:"The pharmacy system vendor charges to connect the robot to its software.",a:"roi",opts:PILLAR,scene:"scale",ask:"Where does this belong in the business case?",log:"Integration fee from the vendor"}
+     ]},
+    {name:"Screen the RPA Candidates",short:"RPA fit",c:"#1fbf86",cs:"#ddf7ec",hc:["#1fbf86","#0b5394"],icon:"rpa",
+     brief:"RPA works best on rule-based, high-volume, stable tasks with structured inputs and a low risk per error. If a better option exists, use it. Screen each task, then decide how each bot runs.",
+     items:[
+       {q:"A task follows the same steps every time, with clear yes or no checks, and runs dozens of times a day.",a:"good",opts:FIT,scene:"gauge",ask:"How does this task score?",log:"Same steps, high volume"},
+       {q:"The pharmacy system is replaced every few months, and the screens change each time.",a:"poor",opts:FIT,scene:"gauge",ask:"How does this task score?",log:"Screens change every few months"},
+       {q:"Requests arrive as handwritten notes and free-text messages.",a:"poor",opts:FIT,scene:"gauge",ask:"How does this task score?",log:"Handwritten and free-text inputs"},
+       {q:"The pharmacy system now offers an API for entering refills.",a:"api",opts:FIT,scene:"gauge",ask:"How does this task score?",log:"An API is available"},
+       {q:"A technician clicks run, and the bot fills in six screens while the technician watches.",a:"attended",opts:MODE,scene:"shift",ask:"How does this bot run?",log:"Technician clicks run"},
+       {q:"The bot runs whenever a new request arrives and sends a person only the exceptions.",a:"unattended",opts:MODE,scene:"shift",ask:"How does this bot run?",log:"Runs alone, sends exceptions"}
+     ]},
+    {name:"Build the Missed-Dose Flow",short:"Event flow",c:"#d65db1",cs:"#fae6f4",hc:["#d65db1","#582fc1"],icon:"escalation",
+     brief:"A dose_missed event starts the workflow. Name each part of the event-driven system, match each safeguard to its human-in-the-loop pattern, and decide how the escalation ladder behaves.",
+     items:[
+       {q:"DoseMate publishes a dose_missed event when the grace period ends.",a:"producer",opts:ROLE,scene:"flow",ask:"Which role does this play?",log:"DoseMate"},
+       {q:"The MQTT broker delivers the event to everything that subscribed.",a:"router",opts:ROLE,scene:"flow",ask:"Which role does this play?",log:"The MQTT broker"},
+       {q:"The nurse task queue receives the event and creates a task.",a:"consumer",opts:ROLE,scene:"flow",ask:"Which role does this play?",log:"The nurse task queue"},
+       {q:"An RPA bot drafts an early refill, and a pharmacist must sign off before it happens.",a:"approval",opts:HITL,scene:"patterns",ask:"Which human-in-the-loop pattern is this?",log:"Pharmacist signs off a drafted refill"},
+       {q:"Three missed doses in two days creates an urgent nurse task.",a:"escalation",opts:HITL,scene:"patterns",ask:"Which human-in-the-loop pattern is this?",log:"Three misses in two days"},
+       {q:"Grace reviews last week's escalations to see which alerts were useful.",a:"audit",opts:HITL,scene:"patterns",ask:"Which human-in-the-loop pattern is this?",log:"Review last week's escalations"},
+       {q:"A dose_taken event arrives while the caregiver text is about to go out.",a:"stop",opts:RULE,scene:"ladder",mode:"stop",ask:"What should the workflow do?",log:"dose_taken arrives mid-ladder",cols:1},
+       {q:"DoseMate's Wi-Fi drops and returns, and the same dose_missed message arrives three times.",a:"dedupe",opts:RULE,scene:"ladder",mode:"dedupe",ask:"What should the workflow do?",log:"Same message arrives three times",cols:1}
+     ]}
+  ];
+  var IDEAS=[
+    {c:"#ff5a5f",cs:"#ffe7e7",t:"Match each task to a physical robot, an RPA bot, an AI agent, or a person. Sometimes the right answer is a person."},
+    {c:"#b98600",cs:"#fff4d1",t:"A robot earns its place through throughput, accuracy, labor freed, and payback. Integration and change management are the costs people forget."},
+    {c:"#1fbf86",cs:"#ddf7ec",t:"RPA fits rule-based, high-volume, stable, structured, low-risk work. When an API exists, a direct integration is usually more reliable."},
+    {c:"#d65db1",cs:"#fae6f4",t:"A missed-dose ladder must stop when the dose is taken, ignore duplicates, and send people only the alerts they need to act on."}
+  ];
+
+  var TOTAL=STATIONS.reduce(function(n,s){return n+s.items.length;},0);
+  var st;function reset(){st={screen:"intro",s:0,i:0,res:STATIONS.map(function(s){return s.items.map(function(){return null;});})};}reset();
+  var $=function(id){return document.getElementById(id);};
+  var $stage=$("stage"),$scene=$("scene"),$hero=$("hero"),$ht=$("htext"),$dock=$("dock");
+  function find(o,k){for(var j=0;j<o.length;j++) if(o[j].key===k) return o[j]; return null;}
+  var timers=[];function later(f,ms){timers.push(setTimeout(f,REDUCED?0:ms));}function clearT(){timers.forEach(clearTimeout);timers=[];}
+  function cap(t){var c=$("scap");if(c)c.innerHTML=t;}
+
+  /* ---------- scenes ---------- */
+  var SC={
+    workers:function(it,k,fresh){
+      $scene.innerHTML='<div class="ws'+(fresh?"":" idle")+'"><div class="ticket" id="tk">'+esc(it?it.log:"New task")+'</div><div class="workers">'+WHO.map(function(o){
+        return '<div class="wk" id="w_'+o.key+'" style="--c:'+o.c+';--cs:'+o.cs+'"><div class="wi">'+ic(o.icon)+'</div><b>'+o.label+'</b></div>';}).join("")+'</div></div><div class="scap" id="scap"></div>';
+      if(!it){cap("Four kinds of worker. Each answer hands a task to one of them.");return;}
+      if(!fresh){cap("Who should catch this task?");return;}
+      if(k!==it.a){var b=$("w_"+k);if(b)b.classList.add("bad");}
+      later(function(){
+        var tk=$("tk"),tgt=$("w_"+it.a);if(!tk||!tgt)return;
+        var a=tk.getBoundingClientRect(),b=tgt.getBoundingClientRect();
+        var dx=(b.left+b.width/2)-(a.left+a.width/2),dy=(b.top+20)-(a.top+a.height/2);
+        tk.classList.add("go");tk.style.transform="translate(calc(-50% + "+dx+"px),"+dy+"px) scale(.45)";
+        later(function(){tk.style.opacity="0";tgt.classList.add("catch");cap("<b>"+find(WHO,it.a).label+"</b> takes this task.");},700);
+      },250);
+    },
+    corridor:function(it,k,fresh){
+      var busy=it&&it.busy;
+      var people=busy?'<g fill="#d65db1"><circle cx="190" cy="100" r="11"/><circle cx="215" cy="125" r="9" fill="#ffc93c"/><circle cx="235" cy="95" r="10" fill="#1fbf86"/></g>':'';
+      var path=busy?"M30 110 L150 110 L185 55 L250 55 L275 110 L330 110":"M30 110 L330 110";
+      $scene.innerHTML='<div class="svgwrap"><svg viewBox="0 0 360 200" role="img" aria-label="Robot route through a '+(busy?"busy corridor":"quiet aisle")+'">'+
+        '<rect x="10" y="30" width="340" height="150" rx="16" fill="#f7f2fb"/>'+
+        '<line x1="30" y1="110" x2="330" y2="110" stroke="#b98600" stroke-width="3" stroke-dasharray="8 7"/>'+
+        '<text x="30" y="50" font-family="Azeret Mono, monospace" font-size="11" fill="#5e586f">'+(busy?"busy hospital corridor":"quiet warehouse aisle")+'</text>'+people+
+        (fresh?'<path id="rpath" d="'+path+'" fill="none" stroke="'+find(MOVE,it.a).c+'" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="500" stroke-dashoffset="500"><animate attributeName="stroke-dashoffset" from="500" to="0" dur="1.8s" fill="freeze"/></path>'+
+          '<g><rect x="-13" y="-9" width="26" height="18" rx="6" fill="'+find(MOVE,it.a).c+'" stroke="#1e1b2e" stroke-width="2"/><animateMotion dur="1.8s" fill="freeze" path="'+path+'"/></g>'
+          :'<rect x="17" y="101" width="26" height="18" rx="6" fill="#ece6f2" stroke="#1e1b2e" stroke-width="2"/>')+
+        '<text x="330" y="140" text-anchor="end" font-family="Lexend, sans-serif" font-size="11" fill="#1e1b2e">destination</text></svg></div><div class="scap" id="scap"></div>';
+      cap(fresh?(it.a==="amr"?"An <b>AMR</b> maps the space and steers around people, like a taxi.":"An <b>AGV</b> follows its marked route, like a train. Cheaper and predictable on a stable path."):"Which robot can make this trip?");
+    },
+    scale:function(it,k,fresh){
+      var si=1,ben=0,cost=0,wL="",wR="";
+      STATIONS[si].items.forEach(function(x,ii){var r=st.res[si][ii];if(!r||x.scene!=="scale")return;
+        var isNew=fresh&&ii===st.i,o=find(PILLAR,x.a);
+        var blk=function(n,xp){return '<g class="'+(isNew?"wdrop":"")+'"><rect x="'+(xp-34)+'" y="'+(98-n*20)+'" width="68" height="18" rx="5" fill="'+o.c+'" stroke="#1e1b2e" stroke-width="1.5"/><text x="'+xp+'" y="'+(111-n*20)+'" text-anchor="middle" font-family="Lexend, sans-serif" font-size="9" fill="#fff">'+esc(o.label.split(" (")[0])+'</text></g>';};
+        if(x.a==="roi"){wL+=blk(cost,70);cost++;}else{wR+=blk(ben,290);ben++;}
+      });
+      var tilt=Math.max(-9,Math.min(9,(ben-cost)*4));
+      $scene.innerHTML='<div class="svgwrap"><svg viewBox="0 0 360 200" role="img" aria-label="Business case balance">'+
+        '<path d="M180 64 L160 186 L200 186 Z" fill="#1e1b2e"/><g id="beam" style="transform:rotate(0deg)">'+
+        '<line x1="60" y1="64" x2="300" y2="64" stroke="#1e1b2e" stroke-width="5" stroke-linecap="round"/><circle cx="180" cy="64" r="7" fill="#ffc93c" stroke="#1e1b2e" stroke-width="2"/>'+
+        '<path d="M70 64 L40 118 L100 118 Z" fill="none" stroke="#5e586f" stroke-width="1.5"/><path d="M290 64 L260 118 L320 118 Z" fill="none" stroke="#5e586f" stroke-width="1.5"/>'+
+        '<rect x="28" y="118" width="84" height="8" rx="4" fill="#582fc1"/><rect x="248" y="118" width="84" height="8" rx="4" fill="#1fbf86"/>'+wL+wR+
+        '<text x="70" y="142" text-anchor="middle" font-family="Lexend, sans-serif" font-weight="600" font-size="11" fill="#1e1b2e">Total cost</text><text x="290" y="142" text-anchor="middle" font-family="Lexend, sans-serif" font-weight="600" font-size="11" fill="#1e1b2e">Yearly benefit</text></g></svg></div><div class="scap" id="scap"></div>';
+      var bm=$("beam");later(function(){if(bm)bm.style.transform="rotate("+tilt+"deg)";},60);
+      cap(fresh?(it.a==="roi"?"Integration belongs in the <b>total cost</b>, which payback and ROI weigh against the yearly benefit.":"<b>"+find(PILLAR,it.a).label+"</b> adds to the yearly benefit side."):"Each fact lands on the cost side or the benefit side of Sam's business case.");
+    },
+    gauge:function(it,k,fresh){
+      var ang={poor:-60,api:0,good:60}[fresh?it.a:"api"];
+      function arc(a1,a2,c){var r=118,cx=180,cy=168,p=function(a){var t=(a-90)*Math.PI/180;return [cx+r*Math.cos(t),cy+r*Math.sin(t)];};var s=p(a1),e=p(a2);
+        return '<path d="M'+s[0].toFixed(1)+' '+s[1].toFixed(1)+' A'+r+' '+r+' 0 0 1 '+e[0].toFixed(1)+' '+e[1].toFixed(1)+'" stroke="'+c+'" stroke-width="26" fill="none"/>';}
+      $scene.innerHTML='<div class="svgwrap"><svg viewBox="0 0 360 200" role="img" aria-label="RPA fit gauge">'+
+        arc(-90,-30,"#ff5a5f")+arc(-30,30,"#0b5394")+arc(30,90,"#1fbf86")+
+        '<text x="52" y="190" font-family="Lexend, sans-serif" font-size="11" font-weight="600" fill="#e8344e">Poor fit</text>'+
+        '<text x="180" y="24" text-anchor="middle" font-family="Lexend, sans-serif" font-size="11" font-weight="600" fill="#0b5394">Use the API</text>'+
+        '<text x="308" y="190" text-anchor="end" font-family="Lexend, sans-serif" font-size="11" font-weight="600" fill="#159a62">Good fit</text>'+
+        '<g id="needle" style="transform:rotate('+(fresh?0:0)+'deg)"><path d="M176 168 L180 70 L184 168 Z" fill="#1e1b2e"/></g><circle cx="180" cy="168" r="10" fill="#ffc93c" stroke="#1e1b2e" stroke-width="2"/></svg></div><div class="scap" id="scap"></div>';
+      var nd=$("needle");
+      if(fresh){later(function(){if(nd)nd.style.transform="rotate("+ang+"deg)";},60);}
+      else{var sw=[-50,50,-30,20,0],ix=0;(function wob(){if(!nd||!nd.isConnected)return;nd.style.transform="rotate("+sw[ix%sw.length]+"deg)";ix++;later(wob,900);})();}
+      cap(fresh?({good:"Rule-based, high volume, stable, structured: a <b>good fit</b> for RPA.",poor:"This breaks a bot or needs judgment or messy inputs: a <b>poor fit</b> for RPA.",api:"If the system has an API, a <b>direct integration</b> is usually more reliable than a bot typing into screens."})[it.a]:"Where does this task land on the fit gauge?");
+    },
+    shift:function(it,k,fresh){
+      var cls=function(key){if(!fresh)return "";if(key===it.a)return " win";if(key===k)return " bad";return " lose";};
+      $scene.innerHTML='<div class="panels">'+
+        '<div class="pn'+cls("attended")+'" style="--c:#b98600;--cs:#fff4d1"><div class="art">'+ic("person")+ic("rpa")+'</div><b>Attended bot</b><small>A person clicks run and watches it help <span class="typing"><i></i><i></i><i></i></span></small></div>'+
+        '<div class="pn'+cls("unattended")+'" style="--c:#582fc1;--cs:#ece6fb"><div class="art">'+ic("unattended")+'</div><b>Unattended bot</b><small>Runs on its own, sends people only exceptions <span class="typing"><i></i><i></i><i></i></span></small></div></div><div class="scap" id="scap"></div>';
+      cap(fresh?"This is an <b>"+find(MODE,it.a).label.toLowerCase()+"</b>.":"A helper at someone's desk, or a back-office worker that runs alone?");
+    },
+    flow:function(it,k,fresh){
+      var nodes=[["producer","DoseMate","publishes dose_missed"],["router","MQTT broker","delivers the event"],["consumer","Nurse task queue","creates a task"]];
+      var cls=function(key){if(!fresh)return "";if(key===it.a)return " win";if(key===k)return " bad";return "";};
+      $scene.innerHTML='<div class="flow">'+nodes.map(function(n,ix){var o=find(ROLE,n[0]);
+        var label=fresh||ix!==ROLE.indexOf(find(ROLE,it?it.a:""))?n[1]:"?";
+        return (ix?'<span class="arrow"></span>':'')+'<div class="fn'+cls(n[0])+'" style="--c:'+o.c+';--cs:'+o.cs+'"><div class="wi">'+ic(o.icon)+'</div><b>'+(fresh?o.label:"?")+'</b><small>'+esc(n[1])+'</small></div>';}).join("")+
+        '<span class="pkt"></span></div><div class="scap" id="scap"></div>';
+      cap(fresh?"<b>"+find(ROLE,it.a).label+":</b> "+({producer:"it creates the event and does not need to know who is listening.",router:"it delivers each event to every subscriber.",consumer:"it reacts to the event, and new consumers can be added without touching the device."})[it.a]:"Producer, router, and consumer. Which part is this?");
+    },
+    patterns:function(it,k,fresh){
+      var sub={approval:"A person signs off first",confidence:"Clear cases auto, unclear to a person",escalation:"Hands off when time or a threshold runs out",audit:"Every action logged for review"};
+      $scene.innerHTML='<div class="grid4">'+HITL.map(function(o){var c="pt";if(fresh){if(o.key===it.a)c+=" win";else if(o.key===k)c+=" bad";else c+=" lose";}
+        return '<div class="'+c+'" style="--c:'+o.c+';--cs:'+o.cs+'"><span class="wi">'+ic(o.icon)+'</span><div><b>'+o.label+'</b><small>'+sub[o.key]+'</small></div></div>';}).join("")+'</div><div class="scap" id="scap"></div>';
+      cap(fresh?"This safeguard uses <b>"+find(HITL,it.a).label.toLowerCase()+"</b>.":"Four patterns decide where people stay in the loop.");
+    },
+    ladder:function(it,k,fresh){
+      var rungs=[["0 min","Confirm the dose is missing; ignore duplicates"],["0 to 10 min","Remind the patient"],["30 to 60 min","Text the caregiver, if agreed"],["1 to 4 hours","Create a nurse task"]];
+      $scene.innerHTML='<div class="ladder" id="lad">'+rungs.map(function(r,ix){return '<div class="rung" id="r'+ix+'"><em>'+r[0]+'</em><span>'+r[1]+(ix===0&&it&&it.mode==="dedupe"?' <span id="envs"><span class="env"></span><span class="env"></span><span class="env"></span></span>':'')+'</span></div>';}).join("")+'</div><div class="scap" id="scap"></div>';
+      if(!fresh){cap("An example escalation ladder for one missed dose. Timings are a starting point, not a clinical standard.");return;}
+      if(it.mode==="stop"){
+        var steps=[0,1,2];steps.forEach(function(ix,n){later(function(){var r=$("r"+ix);if(r)r.classList.add("on");},300+n*450);});
+        later(function(){var r=$("r2");if(r){r.classList.remove("on");r.insertAdjacentHTML("beforeend",'<span class="badge g">dose_taken: stop</span>');}var r3=$("r3");if(r3)r3.classList.add("off");var r2=$("r2");if(r2)r2.classList.add("off");
+          cap("The dose was taken, so the ladder <b>stops</b> and records the outcome. No caregiver text about a solved problem.");},1700);
+      } else {
+        later(function(){var e=document.querySelectorAll("#envs .env");if(e[1]){e[1].style.transform="translateX(-20px)";e[1].style.opacity="0";}if(e[2]){e[2].style.transform="translateX(-40px)";e[2].style.opacity="0";}var r=$("r0");if(r){r.classList.add("on");r.insertAdjacentHTML("beforeend",'<span class="badge g">3 in, 1 kept</span>');}},500);
+        later(function(){var r=$("r1");if(r)r.classList.add("on");cap("The rules engine <b>ignores the duplicates</b>, so the ladder runs once and nurses get one task, not three.");},1300);
+      }
+    }
+  };
+
+  /* ---------- UI ---------- */
+  function renderDock(){
+    $dock.innerHTML=STATIONS.map(function(s,si){
+      var cur=(st.screen==="brief"||st.screen==="item")&&si===st.s;
+      var dots=s.items.map(function(_,ii){var r=st.res[si][ii];return '<i class="'+(r?(r.ok?"ok":"no"):(cur&&st.screen==="item"&&ii===st.i?"cur":""))+'" style="--c:'+s.c+'"></i>';}).join("");
+      return '<div class="dgroup'+(cur?" cur":"")+'" style="--n:'+s.items.length+'"><div class="dl">'+(si+1)+'. '+s.short+'</div><div class="ddots" aria-hidden="true">'+dots+'</div></div>';
+    }).join("")+'<span class="dcount">'+st.res.reduce(function(n,a){return n+a.filter(Boolean).length;},0)+' / '+TOTAL+'</span>';
+  }
+  function heroFor(s){$hero.style.setProperty("--hc1",s?s.hc[0]:"#ff5a5f");$hero.style.setProperty("--hc2",s?s.hc[1]:"#d65db1");}
+  function setS(s){$stage.style.setProperty("--sc",s?s.c:"#0b5394");$stage.style.setProperty("--scs",s?s.cs:"#e3edf8");}
+
+  function intro(){
+    heroFor(null);setS(null);
+    $ht.innerHTML='<span class="k">Module 5 · Automation at Work</span><h2>Every missed dose now creates an event.</h2><p>Nobody has decided what happens next.</p>';
+    SC.workers(null,null,false);
+    var lanes=STATIONS.map(function(s,si){return '<div class="lane" style="--c:'+s.c+';--cs:'+s.cs+'"><div class="li">'+ic(s.icon)+'</div><b>'+(si+1)+'. '+s.name+'</b><small>'+s.items.length+' items</small></div>';}).join("");
+    $stage.innerHTML='<div class="eyebrow">Practice Activity</div><h1>Who Handles the <span class="u">Missed Dose?</span></h1>'+
+      '<p class="lead">Sam\'s technicians retype refill requests every shift, and he wants to know whether a dispensing robot would pay off. Grace worries her nurses will stop reading alerts. Dana wants to know what to automate, with which tool, and where a person must stay in charge. Work through four stations and watch each decision play out above.</p>'+
+      '<div class="lanes">'+lanes+'</div><p class="note">You get one attempt per item. Your answer is recorded, and you move on. About 15 to 20 minutes.</p><button class="btn" id="go">Start Station 1</button>';
+    $("go").onclick=function(){st.screen="brief";st.s=0;render(true);};
+  }
+  function brief(){
+    var s=STATIONS[st.s];heroFor(s);setS(s);
+    $ht.innerHTML='<span class="k">Station '+(st.s+1)+' of '+STATIONS.length+'</span><h2>'+s.name+'</h2><p>'+s.items.length+' items</p>';
+    SC[s.items[0].scene](s.items[0],null,false);
+    var seen={},k="";s.items.forEach(function(it){it.opts.forEach(function(o){if(!seen[o.key]){seen[o.key]=1;k+='<span class="key" style="--cs:'+o.cs+'">'+o.label+'</span>';}});});
+    $stage.innerHTML='<div class="eyebrow">Station '+(st.s+1)+'</div><h1 style="font-size:clamp(24px,3.4vw,34px)">'+s.name+'</h1><p class="lead">'+esc(s.brief)+'</p><div class="keys">'+k+'</div><button class="btn" id="go">Begin '+s.items.length+' items</button>';
+    $("go").onclick=function(){st.screen="item";st.i=0;render(true);};
+  }
+  function item(fresh){
+    clearT();
+    var s=STATIONS[st.s],it=s.items[st.i],r=st.res[st.s][st.i];heroFor(s);setS(s);
+    $ht.innerHTML='<span class="k">Station '+(st.s+1)+' · Item '+(st.i+1)+' of '+s.items.length+'</span><h2>'+s.name+'</h2><p>'+esc(it.ask)+'</p>';
+    var opts=it.opts.map(function(o){var c="opt",t="";
+      if(r){if(o.key===r.k){c+=" mine "+(r.ok?"right":"wrong");t='<span class="tag '+(r.ok?"ok":"no")+'">Your answer</span>';}else if(o.key===it.a){c+=" truth";t='<span class="tag ans">Answer</span>';}else c+=" dim";}
+      return '<button class="'+c+'" data-k="'+o.key+'" style="--c:'+o.c+';--cs:'+o.cs+'"'+(r?" disabled":"")+'><span class="oi">'+ic(o.icon)+'</span><span>'+o.label+(o.sub?'<small>'+o.sub+'</small>':'')+'</span>'+t+'</button>';}).join("");
+    var last=st.i===s.items.length-1,nx=last?(st.s===STATIONS.length-1?"See your automation blueprint":"Go to Station "+(st.s+2)):"Next item";
+    var stat=r?'<div class="status"><div class="m">'+(r.ok?'<span class="dot ok" aria-hidden="true">&#10003;</span>Recorded as correct.':'<span class="dot no" aria-hidden="true">&#215;</span>Recorded as incorrect. The answer is '+esc(find(it.opts,it.a).label)+'.')+'</div><button class="btn" id="next">'+nx+'</button></div>':"";
+    var cols=it.cols||2;
+    $stage.innerHTML='<div class="qhead"><div class="eyebrow">'+s.name+'</div><span class="pill">Item '+(st.i+1)+' of '+s.items.length+'</span></div><div class="prompt">'+esc(it.q)+'</div><div class="ask">'+esc(it.ask)+'</div><div class="opts" style="--cols:'+cols+'">'+opts+'</div>'+stat;
+    SC[it.scene](it,r?r.k:null,!!(r&&fresh));
+    if(!r){Array.prototype.forEach.call($stage.querySelectorAll(".opt"),function(b){b.onclick=function(){choose(b.getAttribute("data-k"));};});}
+    else{var n=$("next");n.onclick=advance;n.focus({preventScroll:true});}
+  }
+  function choose(k){if(st.res[st.s][st.i])return;var it=STATIONS[st.s].items[st.i];st.res[st.s][st.i]={k:k,ok:k===it.a};renderDock();item(true);
+    try{$("hero").scrollIntoView({behavior:REDUCED?"auto":"smooth",block:"start"});}catch(e){}}
+  function advance(){var s=STATIONS[st.s];if(st.i<s.items.length-1)st.i++;else if(st.s<STATIONS.length-1){st.s++;st.i=0;st.screen="brief";}else st.screen="final";render(true);}
+
+  function fin(){
+    clearT();heroFor(null);setS(null);
+    var right=0;
+    var cols=STATIONS.map(function(s,si){var c=st.res[si].filter(function(r){return r&&r.ok;}).length;right+=c;
+      var li=s.items.map(function(it,ii){var r=st.res[si][ii];return '<li><i class="'+(r&&r.ok?"":"no")+'"></i><span>'+esc(it.log)+' <em>· '+esc(find(it.opts,it.a).label)+'</em></span></li>';}).join("");
+      return '<div class="bcol" style="--c:'+s.c+';--cs:'+s.cs+'"><div class="n">'+c+'/'+s.items.length+'</div><div class="l">'+s.name+'</div><ul>'+li+'</ul></div>';}).join("");
+    $ht.innerHTML='<span class="k">Practice Activity complete</span><h2>Automation Blueprint</h2><p>'+right+' of '+TOTAL+' recorded as correct</p>';
+    var conf="",cl=["#ffc93c","#1fbf86","#ff5a5f","#582fc1","#0b5394","#d65db1"];for(var i=0;i<22;i++){conf+='<i style="left:'+(4+i*4.4)+'%;background:'+cl[i%6]+';animation-delay:'+(-(i*0.37)%3.2).toFixed(2)+'s;animation-duration:'+(2.6+(i%5)*0.35).toFixed(2)+'s"></i>';}
+    $scene.innerHTML='<div class="confetti" aria-hidden="true">'+conf+'</div><div class="ws"><div class="workers" style="bottom:20px">'+WHO.map(function(o){return '<div class="wk" style="--c:'+o.c+';--cs:'+o.cs+';animation:bob 2.6s ease-in-out infinite"><div class="wi">'+ic(o.icon)+'</div><b>'+o.label+'</b></div>';}).join("")+'</div></div>';
+    var ideas=IDEAS.map(function(d,i){return '<li data-n="0'+(i+1)+'" style="--c:'+d.c+';--cs:'+d.cs+'">'+esc(d.t)+'</li>';}).join("");
+    $stage.innerHTML='<div class="eyebrow">Practice Activity complete</div><h1>Your Automation <span class="u">Blueprint</span></h1>'+
+      '<p class="lead">You recorded '+right+' of '+TOTAL+' items as correct. Each column lists every decision and its answer, ready to support the swimlane diagram, step table, and escalation rules in your Module 5 assignment.</p>'+
+      '<div class="board">'+cols+'</div><div class="legend"><span><i style="width:10px;height:10px;border-radius:3px;background:var(--ok);display:inline-block"></i>Recorded as correct</span><span><i style="width:10px;height:10px;border-radius:3px;border:2px solid var(--miss);display:inline-block"></i>Recorded as incorrect</span></div>'+
+      '<h3 style="margin:0 0 10px">Four ideas to carry into your workflow design</h3><ul class="ideas">'+ideas+'</ul><button class="btn alt" id="again">Start again</button>';
+    $("again").onclick=function(){reset();render(true);};
+  }
+  function render(top){
+    renderDock();
+    if(st.screen==="intro")intro();else if(st.screen==="brief")brief();else if(st.screen==="item")item(false);else fin();
+    if(top){try{window.scrollTo({top:0,behavior:"smooth"});}catch(e){window.scrollTo(0,0);}if(st.screen!=="item"){var b=$stage.querySelector(".btn");if(b)b.focus({preventScroll:true});}}
+  }
+  render(false);
+})();
+</script>
+</body>
+</html>
